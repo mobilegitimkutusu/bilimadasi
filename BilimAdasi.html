@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilim Adası Macerası</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: #87CEEB;
+        }
+        
+        #oyunAlani {
+            width: 800px;
+            height: 600px;
+            margin: 20px auto;
+            position: relative;
+            background: url('ada-background.jpg');
+            border: 3px solid #2c3e50;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .bolge {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .bolge:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255,255,255,0.8);
+        }
+
+        #magara {
+            top: 200px;
+            left: 100px;
+            background: #8B4513;
+        }
+
+        #gol {
+            top: 300px;
+            left: 400px;
+            background: #4169E1;
+        }
+
+        #orman {
+            top: 150px;
+            left: 600px;
+            background: #228B22;
+        }
+
+        #bilgiPaneli {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            display: none;
+        }
+
+        #skor {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .soru-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            width: 400px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #3498db;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div id="oyunAlani">
+        <div id="skor">Puan: <span id="puanDegeri">0</span></div>
+        <div class="bolge" id="magara" onclick="bolgeyeGit('magara')"></div>
+        <div class="bolge" id="gol" onclick="bolgeyeGit('gol')"></div>
+        <div class="bolge" id="orman" onclick="bolgeyeGit('orman')"></div>
+        
+        <div id="bilgiPaneli"></div>
+        
+        <div class="soru-panel" id="soruPanel">
+            <h3 id="soruBaslik"></h3>
+            <p id="soruMetni"></p>
+            <div id="cevaplar"></div>
+        </div>
+    </div>
+
+    <script>
+        let puan = 0;
+        const sorular = {
+            magara: {
+                baslik: "Basınç Bulmacası",
+                soru: "Mağaranın derinliklerine indikçe kulaklarınızda bir basınç hissediyorsunuz. Bunun sebebi nedir?",
+                cevaplar: [
+                    "Derinlere indikçe hava basıncının artması",
+                    "Mağaradaki sesler",
+                    "Yerçekimi kuvveti",
+                    "Rüzgar etkisi"
+                ],
+                dogruCevap: 0,
+                aciklama: "Derinlere indikçe üzerimizdeki hava sütunu artar ve bu da basıncın artmasına neden olur."
+            },
+            gol: {
+                baslik: "Yüzdürme Kuvveti Bulmacası",
+                soru: "Göldeki bir taş parçası neden suda batarken, aynı büyüklükteki tahta parçası yüzer?",
+                cevaplar: [
+                    "Taşın rengi koyu olduğu için",
+                    "Taşın yoğunluğu suyun yoğunluğundan büyük olduğu için",
+                    "Taş daha ağır göründüğü için",
+                    "Tahta daha büyük göründüğü için"
+                ],
+                dogruCevap: 1,
+                aciklama: "Cisimlerin suda yüzüp batması yoğunluklarına bağlıdır. Yoğunluğu suyun yoğunluğundan küçük olan cisimler yüzer."
+            },
+            orman: {
+                baslik: "Fotosentez Bulmacası",
+                soru: "Ormandaki ağaçlar hangi gazı alıp hangi gazı verir?",
+                cevaplar: [
+                    "Oksijen alır, karbondioksit verir",
+                    "Azot alır, oksijen verir",
+                    "Karbondioksit alır, oksijen verir",
+                    "Hidrojen alır, azot verir"
+                ],
+                dogruCevap: 2,
+                aciklama: "Bitkiler fotosentez sırasında karbondioksit alıp oksijen verirler. Bu sayede dünya üzerindeki oksijen dengesi korunur."
+            }
+        };
+
+        function bolgeyeGit(bolge) {
+            const soruPanel = document.getElementById('soruPanel');
+            const soruBaslik = document.getElementById('soruBaslik');
+            const soruMetni = document.getElementById('soruMetni');
+            const cevaplar = document.getElementById('cevaplar');
+
+            soruBaslik.textContent = sorular[bolge].baslik;
+            soruMetni.textContent = sorular[bolge].soru;
+            cevaplar.innerHTML = '';
+
+            sorular[bolge].cevaplar.forEach((cevap, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.textContent = cevap;
+                btn.onclick = () => cevapKontrol(bolge, index);
+                cevaplar.appendChild(btn);
+            });
+
+            soruPanel.style.display = 'block';
+        }
+
+        function cevapKontrol(bolge, secilenCevap) {
+            const bilgiPanel = document.getElementById('bilgiPaneli');
+            const soruPanel = document.getElementById('soruPanel');
+
+            if (secilenCevap === sorular[bolge].dogruCevap) {
+                puan += 10;
+                document.getElementById('puanDegeri').textContent = puan;
+                bilgiPanel.innerHTML = `<h3>Doğru!</h3><p>${sorular[bolge].aciklama}</p>`;
+                document.getElementById(bolge).style.backgroundColor = '#2ecc71';
+            } else {
+                bilgiPanel.innerHTML = '<h3>Yanlış!</h3><p>Tekrar deneyebilirsin.</p>';
+            }
+
+            bilgiPanel.style.display = 'block';
+            soruPanel.style.display = 'none';
+
+            setTimeout(() => {
+                bilgiPanel.style.display = 'none';
+            }, 3000);
+
+            if (puan >= 30) {
+                alert('Tebrikler! Tüm bulmacaları çözdünüz ve adadan kaçmayı başardınız!');
+            }
+        }
+    </script>
+</body>
+</html>
